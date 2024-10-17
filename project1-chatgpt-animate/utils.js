@@ -180,13 +180,12 @@ function getModelViewMatrix() {
     // note : matrix multiplication (A,B) -> A*B 
     // Rotataion * Scaling * Translation  then this will be applied to the cube vertices.
     rotationMat = multiplyMatrices 
-           // (ZrMat, multiplyMatrices(YrMat, multiplyMatrices(XrMat, createIdentityMatrix()) ) ); 
            ( multiplyMatrices(ZrMat, YrMat), XrMat );
             //ROTATION MATRIX = ( RotZ * RotY ) * RotX
 
     compositeMatrix = multiplyMatrices
             ( multiplyMatrices(translationMat, rotationMat ) , scalingMat);
-            //compositeMtx = ( ROT * SCALE ) * TRANSLATE 
+            //compositeMtx = (TRANSLATE * ROT ) * SCALE 
     // resulting composite matrix will scale, then rotate, then translate the vertices.
     return compositeMatrix;
 }
