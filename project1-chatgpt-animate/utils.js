@@ -164,6 +164,31 @@ function getChatGPTModelViewMatrix() {
 function getModelViewMatrix() {
     // calculate the model view matrix by using the transformation
     // methods and return the modelView matrix in this method
+
+    // composite transformation matrix M = ( T * R * S ) -> M * (THE VERTICES OF THE CUBE) 
+    // ROTATION MATRIX = ( ROTATE Z ( ROTATE Y (ROTATE X) ) ) 
+
+    translationMat = createTranslationMatrix(0.3, -0.25, 0.0);
+    scalingMat = createScaleMatrix(0.5,0.5,1);
+
+    // degrees should be converted to radian ( degrees × π / 180°)
+    //  -> 30 deg = π/6 rad ; 45 deg = π/4 rad ; 60 deg = π/3 rad
+    XrMat = createRotationMatrix_X( Math.PI /6 );
+    YrMat = createRotationMatrix_Y( Math.PI /4 );
+    ZrMat = createRotationMatrix_Z( Math.PI /3 );
+
+    // note : matrix multiplication (A,B) -> A*B 
+    // Rotataion * Scaling * Translation  then this will be applied to the cube vertices.
+    rotationMat = multiplyMatrices 
+           // (ZrMat, multiplyMatrices(YrMat, multiplyMatrices(XrMat, createIdentityMatrix()) ) ); 
+           ( multiplyMatrices(ZrMat, YrMat), XrMat );
+            //ROTATION MATRIX = ( RotZ * RotY ) * RotX
+
+    compositeMatrix = multiplyMatrices
+            ( multiplyMatrices(translationMat, rotationMat ) , scalingMat);
+            //compositeMtx = ( ROT * SCALE ) * TRANSLATE 
+    // resulting composite matrix will scale, then rotate, then translate the vertices.
+    return compositeMatrix;
 }
 
 /**
