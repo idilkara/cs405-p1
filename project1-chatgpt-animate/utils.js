@@ -202,6 +202,44 @@ function getModelViewMatrix() {
 function getPeriodicMovement(startTime) {
     // this metdo should return the model view matrix at the given time
     // to get a smooth animation
+
+    // most of this code is written by giving prompts to chatgpt;
+    //ChatGPT: https://chatgpt.com/share/670eddb4-70b4-8011-85d8-dd906f9e9e30
+    //ChatGPT defined some of the variables globally but those can be defined inside the function - I defined them below.
+    let initialTransformationMatrix = createIdentityMatrix(); // Start with an identity matrix
+    let targetTransformationMatrix = getModelViewMatrix(); // Calculate the target transformation
+
+    const duration = 10; // Total duration for one cycle in seconds
+    const transitionDuration = 5; // Duration for each transition phase
+    const currentTime = (Date.now() - startTime) / 1000; // Get current time in seconds
+    const elapsed = currentTime % duration; // Calculate the elapsed time in the current cycle
+
+    let transformationMatrix;
+
+    // Nested function to interpolate between two transformation matrices
+    function interpolateTransformation(startMatrix, endMatrix, t) {
+        // Interpolate between two transformation matrices based on parameter t
+        const result = new Float32Array(16); // Assuming 4x4 transformation matrices
+
+        for (let i = 0; i < 16; i++) {
+            result[i] = startMatrix[i] + t * (endMatrix[i] - startMatrix[i]);
+        }
+
+        return result;
+    }
+
+    // Calculate the progress of the transition
+    if (elapsed < transitionDuration) {
+        // First 5 seconds: Transition to the new transformation
+        const progress = elapsed / transitionDuration;
+        transformationMatrix = interpolateTransformation(initialTransformationMatrix, targetTransformationMatrix, progress);
+    } else {
+        // Last 5 seconds: Return to the original position
+        const progress = (elapsed - transitionDuration) / transitionDuration;
+        transformationMatrix = interpolateTransformation(targetTransformationMatrix, initialTransformationMatrix, progress);
+    }
+
+    return transformationMatrix;
 }
 
 
